@@ -39,3 +39,14 @@ class XibLoadedView: UIView {
         return nil
     }
 }
+
+extension UIView {
+    @discardableResult
+    func viewLoadedFromNib<T: UIView>(named nibName: String? = nil) -> T? {
+        let nibName = nibName ?? String(describing: type(of: self))
+        let bundle = Bundle(for: type(of: self))
+        let nib = UINib(nibName: nibName, bundle: bundle)
+        let view = nib.instantiate(withOwner: self, options: nil).first as? T
+        return view
+    }
+}
