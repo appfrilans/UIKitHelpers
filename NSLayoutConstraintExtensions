@@ -1,0 +1,19 @@
+import UIKit
+
+var keyboardAnimationTimeInSeconds = 0.2
+
+extension NSLayoutConstraint {
+    class func matching(item childView: UIView,
+                        toItem: UIView,
+                        attribute: NSLayoutConstraint.Attribute,
+                        multiplier: CGFloat = 1.0,
+                        constant: CGFloat = 0) -> NSLayoutConstraint {
+        return NSLayoutConstraint(item: childView,
+                                  attribute: attribute,
+                                  relatedBy: .equal,
+                                  toItem: toItem,
+                                  attribute: attribute,
+                                  multiplier: multiplier,
+                                  constant: constant)
+    }
+}
