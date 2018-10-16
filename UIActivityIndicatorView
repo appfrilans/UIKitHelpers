@@ -1,0 +1,11 @@
+import UIKit
+
+extension UIActivityIndicatorView {
+    func setInProgress(_ inProgress: Bool) {
+        if inProgress {
+            startAnimating()
+        } else {
+            stopAnimating()
+        }
+    }
+}
