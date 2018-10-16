@@ -1,0 +1,101 @@
+import UIKit
+
+typealias ParentView = UIView
+typealias ChildView = UIView
+
+extension UIView {
+    func addConstraints(matching parentView: ParentView) {
+        var constraints = [NSLayoutConstraint]()
+
+        self.translatesAutoresizingMaskIntoConstraints = false
+        constraints.append(NSLayoutConstraint.matching(item: parentView, toItem: self, attribute: .left))
+        constraints.append(NSLayoutConstraint.matching(item: parentView, toItem: self, attribute: .right))
+        constraints.append(NSLayoutConstraint(item: parentView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0.0))
+        constraints.append(NSLayoutConstraint(item: parentView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0))
+
+        parentView.addConstraints(constraints)
+    }
+    
+    @discardableResult
+    func viewLoadedFromNib<T: UIView>(named nibName: String? = nil) -> T? {
+        let nibName = nibName ?? String(describing: type(of: self))
+        let bundle = Bundle(for: type(of: self))
+        let nib = UINib(nibName: nibName, bundle: bundle)
+        let view = nib.instantiate(withOwner: self, options: nil).first as? T
+        return view
+    }
+
+    @discardableResult
+    func viewLoadedFromNibAttached<T: UIView>(named name: String? = nil) -> T? {
+        let view = viewLoadedFromNib(named: name)
+        addViewWithConstraints(view!)
+        return view as? T
+    }
+    
+        func constraints(for childView: ChildView, height: CGFloat) -> [NSLayoutConstraint] {
+        var constraints = [NSLayoutConstraint]()
+
+        childView.translatesAutoresizingMaskIntoConstraints = false
+        constraints.append(NSLayoutConstraint.matching(item: childView, toItem: self, attribute: .left))
+        constraints.append(NSLayoutConstraint.matching(item: childView, toItem: self, attribute: .right))
+        constraints.append(NSLayoutConstraint(item: childView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: height))
+        constraints.append(NSLayoutConstraint(item: childView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0))
+        return constraints
+    }
+
+    func subviewMatchingType<View: UIView>(iterating: Bool) -> View? {
+        for subview in self.subviews {
+            if let subview = subview as? View {
+                return subview
+            }
+            if iterating {
+                if let subviewMatchingType: View = subview.subviewMatchingType(iterating: true) {
+                    return subviewMatchingType
+                }
+            }
+        }
+        return nil
+    }
+
+    func matchSafeAreaTopBottom(of parentView: UIView) {
+        let guide = parentView.safeAreaLayoutGuide
+        self.translatesAutoresizingMaskIntoConstraints = false
+        trailingAnchor.constraint(equalTo: guide.trailingAnchor).isActive = true
+        leadingAnchor.constraint(equalTo: guide.leadingAnchor).isActive = true
+        topAnchor.constraint(equalTo: guide.topAnchor).isActive = true
+        bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
+    }
+}
+
+@IBDesignable extension UIView {
+    @IBInspectable var borderColor: UIColor? {
+        set {
+            layer.borderColor = newValue?.cgColor
+        }
+        get {
+            guard let color = layer.borderColor else {
+                return nil
+            }
+            return UIColor(cgColor: color)
+        }
+    }
+
+    @IBInspectable var borderWidth: CGFloat {
+        set {
+            layer.borderWidth = newValue
+        }
+        get {
+            return layer.borderWidth
+        }
+    }
+
+    @IBInspectable var cornerRadius: CGFloat {
+        set {
+            layer.cornerRadius = newValue
+            clipsToBounds = newValue > 0
+        }
+        get {
+            return layer.cornerRadius
+        }
+    }
+}
